@@ -22,7 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/ethereum/go-ethereum"
+	"github.com/mrFranklin/web3go/ethereum"
 
 	"github.com/mrFranklin/web3go/core/types"
 
@@ -95,7 +95,7 @@ func (ec *Client) getBlock(ctx context.Context, method string, args ...interface
 	if err != nil {
 		return nil, err
 	} else if len(raw) == 0 {
-		return nil, NotFound
+		return nil, ethereum.NotFound
 	}
 	// Decode header and transactions.
 	var head *types.Header
@@ -164,7 +164,7 @@ func (ec *Client) HeaderByHash(ctx context.Context, hash common.Hash) (*types.He
 	var head *types.Header
 	err := ec.c.CallContext(ctx, &head, "eth_getBlockByHash", hash, false)
 	if err == nil && head == nil {
-		err = NotFound
+		err = ethereum.NotFound
 	}
 	return head, err
 }
@@ -175,7 +175,7 @@ func (ec *Client) HeaderByNumber(ctx context.Context, number *big.Int) (*types.H
 	var head *types.Header
 	err := ec.c.CallContext(ctx, &head, "eth_getBlockByNumber", toBlockNumArg(number), false)
 	if err == nil && head == nil {
-		err = NotFound
+		err = ethereum.NotFound
 	}
 	return head, err
 }
@@ -187,7 +187,7 @@ func (ec *Client) TransactionByHash(ctx context.Context, hash common.Hash) (tx *
 	if err != nil {
 		return nil, false, err
 	} else if json == nil {
-		return nil, false, NotFound
+		return nil, false, ethereum.NotFound
 	} else if _, r, _ := json.RawSignatureValues(); r == nil {
 		return nil, false, fmt.Errorf("server returned transaction without signature")
 	}
@@ -235,7 +235,7 @@ func (ec *Client) TransactionInBlock(ctx context.Context, blockHash common.Hash,
 	err := ec.c.CallContext(ctx, &json, "eth_getTransactionByBlockHashAndIndex", blockHash, hexutil.Uint64(index))
 	if err == nil {
 		if json == nil {
-			return nil, NotFound
+			return nil, ethereum.NotFound
 		} else if _, r, _ := json.RawSignatureValues(); r == nil {
 			return nil, fmt.Errorf("server returned transaction without signature")
 		}
@@ -253,7 +253,7 @@ func (ec *Client) TransactionReceipt(ctx context.Context, txHash common.Hash) (*
 	err := ec.c.CallContext(ctx, &r, "eth_getTransactionReceipt", txHash)
 	if err == nil {
 		if r == nil {
-			return nil, NotFound
+			return nil, ethereum.NotFound
 		}
 	}
 	return r, err
@@ -523,7 +523,7 @@ func (ec *Client) GetChainConfig(ctx context.Context) (*params.ChainConfig, erro
 	var chainConfig *params.ChainConfig
 	err := ec.c.CallContext(ctx, &chainConfig, "eth_getChainConfig")
 	if err == nil && chainConfig == nil {
-		err = NotFound
+		err = ethereum.NotFound
 	}
 	return chainConfig, err
 }
@@ -534,7 +534,7 @@ func (ec *Client) ReceiptsInBlock(ctx context.Context, blockHash common.Hash) ([
 	err := ec.c.CallContext(ctx, &r, "eth_getBlockReceipts", blockHash)
 	if err == nil {
 		if r == nil {
-			return nil, NotFound
+			return nil, ethereum.NotFound
 		}
 	}
 	return r, err
