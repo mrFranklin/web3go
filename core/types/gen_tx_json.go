@@ -7,13 +7,12 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/mrFranklin/web3go/common"
-	"github.com/mrFranklin/web3go/common/hexutil"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 var _ = (*txdataMarshaling)(nil)
 
-// MarshalJSON marshals as JSON.
 func (t txdata) MarshalJSON() ([]byte, error) {
 	type txdata struct {
 		AccountNonce hexutil.Uint64  `json:"nonce"    gencodec:"required"`
@@ -26,9 +25,6 @@ func (t txdata) MarshalJSON() ([]byte, error) {
 		R            *hexutil.Big    `json:"r" gencodec:"required"`
 		S            *hexutil.Big    `json:"s" gencodec:"required"`
 		Hash         *common.Hash    `json:"hash" rlp:"-"`
-		BlockNumber  *string         `json:"blockNumber,omitempty"`
-		BlockHash    *common.Hash    `json:"blockHash,omitempty"`
-		From         *common.Address `json:"from,omitempty"`
 	}
 	var enc txdata
 	enc.AccountNonce = hexutil.Uint64(t.AccountNonce)
@@ -41,13 +37,9 @@ func (t txdata) MarshalJSON() ([]byte, error) {
 	enc.R = (*hexutil.Big)(t.R)
 	enc.S = (*hexutil.Big)(t.S)
 	enc.Hash = t.Hash
-	enc.BlockNumber = t.BlockNumber
-	enc.BlockHash = t.BlockHash
-	enc.From = t.From
 	return json.Marshal(&enc)
 }
 
-// UnmarshalJSON unmarshals from JSON.
 func (t *txdata) UnmarshalJSON(input []byte) error {
 	type txdata struct {
 		AccountNonce *hexutil.Uint64 `json:"nonce"    gencodec:"required"`
@@ -60,9 +52,6 @@ func (t *txdata) UnmarshalJSON(input []byte) error {
 		R            *hexutil.Big    `json:"r" gencodec:"required"`
 		S            *hexutil.Big    `json:"s" gencodec:"required"`
 		Hash         *common.Hash    `json:"hash" rlp:"-"`
-		BlockNumber  *string         `json:"blockNumber,omitempty"`
-		BlockHash    *common.Hash    `json:"blockHash,omitempty"`
-		From         *common.Address `json:"from,omitempty"`
 	}
 	var dec txdata
 	if err := json.Unmarshal(input, &dec); err != nil {
@@ -105,15 +94,6 @@ func (t *txdata) UnmarshalJSON(input []byte) error {
 	t.S = (*big.Int)(dec.S)
 	if dec.Hash != nil {
 		t.Hash = dec.Hash
-	}
-	if dec.BlockNumber != nil {
-		t.BlockNumber = dec.BlockNumber
-	}
-	if dec.BlockHash != nil {
-		t.BlockHash = dec.BlockHash
-	}
-	if dec.From != nil {
-		t.From = dec.From
 	}
 	return nil
 }

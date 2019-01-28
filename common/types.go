@@ -26,8 +26,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/mrFranklin/web3go/common/hexutil"
-	"github.com/mrFranklin/web3go/crypto/sha3"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/crypto/sha3"
 )
 
 // Lengths of hashes and addresses in bytes.

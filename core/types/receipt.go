@@ -22,9 +22,9 @@ import (
 	"io"
 	"unsafe"
 
-	"github.com/mrFranklin/web3go/common"
-	"github.com/mrFranklin/web3go/common/hexutil"
-	"github.com/mrFranklin/web3go/rlp"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 //go:generate gencodec -type Receipt -field-override receiptMarshaling -out gen_receipt_json.go

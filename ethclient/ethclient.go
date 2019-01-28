@@ -22,16 +22,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/ethereum/go-ethereum"
-
-	"github.com/mrFranklin/web3go/core/types"
-
-	"github.com/mrFranklin/web3go/common"
-	"github.com/mrFranklin/web3go/common/hexutil"
-	"github.com/mrFranklin/web3go/params"
-	"github.com/mrFranklin/web3go/rlp"
-	"github.com/mrFranklin/web3go/rpc"
+	"github.com/ethereum/go-ethereum/params"
 	"math/big"
+
+	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/rpc"
 )
 
 // Client defines typed wrappers for the Ethereum RPC API.
@@ -82,11 +81,11 @@ func (ec *Client) BlockByNumber(ctx context.Context, number *big.Int) (*types.Bl
 
 // Asterera
 type rpcBlock struct {
-	Hash         common.Hash         `json:"hash"`
-	Size         hexutil.Uint64      `json:"size"`
-	Td           *hexutil.Big        `json:"totalDifficulty"`
-	Transactions []types.Transaction `json:"transactions"`
-	UncleHashes  []common.Hash       `json:"uncles"`
+	Hash         common.Hash      `json:"hash"`
+	Size         hexutil.Uint64   `json:"size"`
+	Td           *hexutil.Big     `json:"totalDifficulty"`
+	Transactions []rpcTransaction `json:"transactions"`
+	UncleHashes  []common.Hash    `json:"uncles"`
 }
 
 func (ec *Client) getBlock(ctx context.Context, method string, args ...interface{}) (*types.Block, error) {
@@ -95,7 +94,7 @@ func (ec *Client) getBlock(ctx context.Context, method string, args ...interface
 	if err != nil {
 		return nil, err
 	} else if len(raw) == 0 {
-		return nil, NotFound
+		return nil, ethereum.NotFound
 	}
 	// Decode header and transactions.
 	var head *types.Header
@@ -146,16 +145,15 @@ func (ec *Client) getBlock(ctx context.Context, method string, args ...interface
 	// Fill the sender cache of transactions in the block.
 	txs := make([]*types.Transaction, len(body.Transactions))
 	for i, tx := range body.Transactions {
-		if tx.From() != nil {
-			setSenderFromServer(&tx, *tx.From(), body.Hash)
+		if tx.From != nil {
+			setSenderFromServer(tx.tx, *tx.From, body.Hash)
 		}
-		txs[i] = &tx
+		txs[i] = tx.tx
 	}
 	block := types.NewBlockWithHeader(head).WithBody(txs, uncles)
 	block.SetHash(body.Hash)
 	block.SetSize(common.StorageSize(body.Size))
 	block.SetTd((*big.Int)(body.Td))
-
 	return block, nil
 }
 
@@ -164,7 +162,7 @@ func (ec *Client) HeaderByHash(ctx context.Context, hash common.Hash) (*types.He
 	var head *types.Header
 	err := ec.c.CallContext(ctx, &head, "eth_getBlockByHash", hash, false)
 	if err == nil && head == nil {
-		err = NotFound
+		err = ethereum.NotFound
 	}
 	return head, err
 }
@@ -175,26 +173,44 @@ func (ec *Client) HeaderByNumber(ctx context.Context, number *big.Int) (*types.H
 	var head *types.Header
 	err := ec.c.CallContext(ctx, &head, "eth_getBlockByNumber", toBlockNumArg(number), false)
 	if err == nil && head == nil {
-		err = NotFound
+		err = ethereum.NotFound
 	}
 	return head, err
 }
 
+type rpcTransaction struct {
+	tx *types.Transaction
+	txExtraInfo
+}
+
+type txExtraInfo struct {
+	BlockNumber *string         `json:"blockNumber,omitempty"`
+	BlockHash   *common.Hash    `json:"blockHash,omitempty"`
+	From        *common.Address `json:"from,omitempty"`
+}
+
+func (tx *rpcTransaction) UnmarshalJSON(msg []byte) error {
+	if err := json.Unmarshal(msg, &tx.tx); err != nil {
+		return err
+	}
+	return json.Unmarshal(msg, &tx.txExtraInfo)
+}
+
 // TransactionByHash returns the transaction with the given hash.
 func (ec *Client) TransactionByHash(ctx context.Context, hash common.Hash) (tx *types.Transaction, isPending bool, err error) {
-	var json *types.Transaction
+	var json *rpcTransaction
 	err = ec.c.CallContext(ctx, &json, "eth_getTransactionByHash", hash)
 	if err != nil {
 		return nil, false, err
 	} else if json == nil {
-		return nil, false, NotFound
-	} else if _, r, _ := json.RawSignatureValues(); r == nil {
+		return nil, false, ethereum.NotFound
+	} else if _, r, _ := json.tx.RawSignatureValues(); r == nil {
 		return nil, false, fmt.Errorf("server returned transaction without signature")
 	}
-	if json.From() != nil && json.BlockHash() != nil {
-		setSenderFromServer(json, *json.From(), *json.BlockHash())
+	if json.From != nil && json.BlockHash != nil {
+		setSenderFromServer(json.tx, *json.From, *json.BlockHash)
 	}
-	return json, json.BlockNumber == nil, nil
+	return json.tx, json.BlockNumber == nil, nil
 }
 
 // TransactionSender returns the sender address of the given transaction. The transaction
@@ -231,19 +247,19 @@ func (ec *Client) TransactionCount(ctx context.Context, blockHash common.Hash) (
 
 // TransactionInBlock returns a single transaction at index in the given block.
 func (ec *Client) TransactionInBlock(ctx context.Context, blockHash common.Hash, index uint) (*types.Transaction, error) {
-	var json *types.Transaction
+	var json *rpcTransaction
 	err := ec.c.CallContext(ctx, &json, "eth_getTransactionByBlockHashAndIndex", blockHash, hexutil.Uint64(index))
 	if err == nil {
 		if json == nil {
-			return nil, NotFound
-		} else if _, r, _ := json.RawSignatureValues(); r == nil {
+			return nil, ethereum.NotFound
+		} else if _, r, _ := json.tx.RawSignatureValues(); r == nil {
 			return nil, fmt.Errorf("server returned transaction without signature")
 		}
 	}
 	if json.From != nil && json.BlockHash != nil {
-		setSenderFromServer(json, *json.From(), *json.BlockHash())
+		setSenderFromServer(json.tx, *json.From, *json.BlockHash)
 	}
-	return json, err
+	return json.tx, err
 }
 
 // TransactionReceipt returns the receipt of a transaction by transaction hash.
@@ -253,7 +269,7 @@ func (ec *Client) TransactionReceipt(ctx context.Context, txHash common.Hash) (*
 	err := ec.c.CallContext(ctx, &r, "eth_getTransactionReceipt", txHash)
 	if err == nil {
 		if r == nil {
-			return nil, NotFound
+			return nil, ethereum.NotFound
 		}
 	}
 	return r, err
@@ -523,7 +539,7 @@ func (ec *Client) GetChainConfig(ctx context.Context) (*params.ChainConfig, erro
 	var chainConfig *params.ChainConfig
 	err := ec.c.CallContext(ctx, &chainConfig, "eth_getChainConfig")
 	if err == nil && chainConfig == nil {
-		err = NotFound
+		err = ethereum.NotFound
 	}
 	return chainConfig, err
 }
@@ -531,10 +547,10 @@ func (ec *Client) GetChainConfig(ctx context.Context) (*params.ChainConfig, erro
 // ReceiptsInBlock returns the transaction receipts in a block.
 func (ec *Client) ReceiptsInBlock(ctx context.Context, blockHash common.Hash) ([]*types.Receipt, error) {
 	var r []*types.Receipt
-	err := ec.c.CallContext(ctx, &r, "eth_getBlockReceipts", blockHash)
+	err := ec.c.CallContext(ctx, &r, "eth_getReceipts", blockHash)
 	if err == nil {
 		if r == nil {
-			return nil, NotFound
+			return nil, ethereum.NotFound
 		}
 	}
 	return r, err

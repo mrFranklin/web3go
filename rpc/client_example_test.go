@@ -22,11 +22,11 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/mrFranklin/web3go/rpc"
+	"github.com/ethereum/go-ethereum/rpc"
 	"testing"
-	"github.com/mrFranklin/web3go/common/hexutil"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"encoding/json"
-	"github.com/mrFranklin/web3go/core/types"
+	"github.com/ethereum/go-ethereum/core/types"
 )
 
 // In this example, our client wishes to track the latest 'block number'

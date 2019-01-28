@@ -23,9 +23,9 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/mrFranklin/web3go/common"
-	"github.com/mrFranklin/web3go/crypto"
-	"github.com/mrFranklin/web3go/rlp"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // The values in those tests are from the Transaction Tests

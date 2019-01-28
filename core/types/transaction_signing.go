@@ -22,9 +22,9 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/mrFranklin/web3go/common"
-	"github.com/mrFranklin/web3go/crypto"
-	// "github.com/mrFranklin/web3go/params"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 var (
@@ -39,18 +39,18 @@ type sigCache struct {
 }
 
 // MakeSigner returns a Signer based on the given chain config and block number.
-// func MakeSigner(config *params.ChainConfig, blockNumber *big.Int) Signer {
-// 	var signer Signer
-// 	switch {
-// 	case config.IsEIP155(blockNumber):
-// 		signer = NewEIP155Signer(config.ChainID)
-// 	case config.IsHomestead(blockNumber):
-// 		signer = HomesteadSigner{}
-// 	default:
-// 		signer = FrontierSigner{}
-// 	}
-// 	return signer
-// }
+func MakeSigner(config *params.ChainConfig, blockNumber *big.Int) Signer {
+	var signer Signer
+	switch {
+	case config.IsEIP155(blockNumber):
+		signer = NewEIP155Signer(config.ChainID)
+	case config.IsHomestead(blockNumber):
+		signer = HomesteadSigner{}
+	default:
+		signer = FrontierSigner{}
+	}
+	return signer
+}
 
 // SignTx signs the transaction using the given signer and private key
 func SignTx(tx *Transaction, s Signer, prv *ecdsa.PrivateKey) (*Transaction, error) {

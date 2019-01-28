@@ -1,4 +1,3 @@
-// Copyright 2019 mr_franklin
 // Copyright 2014 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //
@@ -20,7 +19,6 @@ package types
 
 import (
 	"encoding/binary"
-	"encoding/json"
 	"io"
 	"math/big"
 	"sort"
@@ -28,10 +26,10 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/mrFranklin/web3go/common"
-	"github.com/mrFranklin/web3go/common/hexutil"
-	"github.com/mrFranklin/web3go/crypto/sha3"
-	"github.com/mrFranklin/web3go/rlp"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/crypto/sha3"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 var (
@@ -142,10 +140,6 @@ type Block struct {
 	// inter-peer block relay.
 	ReceivedAt   time.Time
 	ReceivedFrom interface{}
-}
-
-func (b *Block) UnmarshalJSON(msg []byte) error {
-	return json.Unmarshal(msg, &b)
 }
 
 // DeprecatedTd is an old relic for extracting the TD of a block. It is in the

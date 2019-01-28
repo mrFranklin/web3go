@@ -21,9 +21,10 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/mrFranklin/web3go/common"
-	"github.com/mrFranklin/web3go/crypto"
-	"github.com/mrFranklin/go-log"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/metrics"
 )
 
 var (
@@ -34,24 +35,24 @@ var (
 	emptyState = crypto.Keccak256Hash(nil)
 )
 
-// var (
-// 	cacheMissCounter   = metrics.NewRegisteredCounter("trie/cachemiss", nil)
-// 	cacheUnloadCounter = metrics.NewRegisteredCounter("trie/cacheunload", nil)
-// )
+var (
+	cacheMissCounter   = metrics.NewRegisteredCounter("trie/cachemiss", nil)
+	cacheUnloadCounter = metrics.NewRegisteredCounter("trie/cacheunload", nil)
+)
 
 // CacheMisses retrieves a global counter measuring the number of cache misses
 // the trie had since process startup. This isn't useful for anything apart from
 // trie debugging purposes.
-// func CacheMisses() int64 {
-// 	return cacheMissCounter.Count()
-// }
+func CacheMisses() int64 {
+	return cacheMissCounter.Count()
+}
 
 // CacheUnloads retrieves a global counter measuring the number of cache unloads
 // the trie did since process startup. This isn't useful for anything apart from
 // trie debugging purposes.
-// func CacheUnloads() int64 {
-// 	return cacheUnloadCounter.Count()
-// }
+func CacheUnloads() int64 {
+	return cacheUnloadCounter.Count()
+}
 
 // LeafCallback is a callback type invoked when a trie operation reaches a leaf
 // node. It's used by state sync and commit to allow handling external references
@@ -91,22 +92,22 @@ func (t *Trie) newFlag() nodeFlag {
 // trie is initially empty and does not require a database. Otherwise,
 // New will panic if db is nil and returns a MissingNodeError if root does
 // not exist in the database. Accessing the trie loads nodes from db on demand.
-// func New(root common.Hash, db *Database) (*Trie, error) {
-// 	if db == nil {
-// 		panic("trie.New called without a database")
-// 	}
-// 	trie := &Trie{
-// 		db: db,
-// 	}
-// 	if root != (common.Hash{}) && root != emptyRoot {
-// 		rootnode, err := trie.resolveHash(root[:], nil)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		trie.root = rootnode
-// 	}
-// 	return trie, nil
-// }
+func New(root common.Hash, db *Database) (*Trie, error) {
+	if db == nil {
+		panic("trie.New called without a database")
+	}
+	trie := &Trie{
+		db: db,
+	}
+	if root != (common.Hash{}) && root != emptyRoot {
+		rootnode, err := trie.resolveHash(root[:], nil)
+		if err != nil {
+			return nil, err
+		}
+		trie.root = rootnode
+	}
+	return trie, nil
+}
 
 // NodeIterator returns an iterator that returns nodes of the trie. Iteration starts at
 // the key after the given start key.
@@ -427,7 +428,7 @@ func (t *Trie) resolve(n node, prefix []byte) (node, error) {
 }
 
 func (t *Trie) resolveHash(n hashNode, prefix []byte) (node, error) {
-	// cacheMissCounter.Inc(1)
+	cacheMissCounter.Inc(1)
 
 	hash := common.BytesToHash(n)
 	if node := t.db.node(hash, t.cachegen); node != nil {

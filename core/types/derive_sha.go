@@ -19,9 +19,9 @@ package types
 import (
 	"bytes"
 
-	"github.com/mrFranklin/web3go/common"
-	"github.com/mrFranklin/web3go/rlp"
-	"github.com/mrFranklin/web3go/trie"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 type DerivableList interface {

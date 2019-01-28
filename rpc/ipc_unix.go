@@ -25,7 +25,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mrFranklin/go-log"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 /*

@@ -20,8 +20,8 @@ import (
 	"context"
 	"net"
 
-	"github.com/mrFranklin/go-log"
-	"github.com/mrFranklin/web3go/p2p/netutil"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/p2p/netutil"
 )
 
 // ServeListener accepts connections on l, serving JSON-RPC on them.
