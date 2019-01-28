@@ -1,0 +1,43 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "w9jJh1F2UTrq4aRsTSho+9TyjCo=",
+			"path": "github.com/allegro/bigcache",
+			"revision": "84a0ff3f153cbd7e280a19029a864bb04b504e62",
+			"revisionTime": "2019-01-16T15:32:54Z"
+		},
+		{
+			"checksumSHA1": "kto0asmOE+Nuhj7T8cvrvIwq2ak=",
+			"path": "github.com/aristanetworks/goarista/monotime",
+			"revision": "8f049bdb8feb7d7d5f1a9b9cd854396112fb0c0e",
+			"revisionTime": "2018-08-30T01:17:19Z"
+		},
+		{
+			"checksumSHA1": "CSPbwbyzqA6sfORicn4HFtIhF/c=",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "d8f796af33cc11cb798c1aaeb27a4ebc5099927d",
+			"revisionTime": "2018-08-30T19:11:22Z"
+		},
+		{
+			"checksumSHA1": "vwNjR8772Pqs8z9ZdPFoatNI9Kg=",
+			"path": "github.com/deckarep/golang-set",
+			"revision": "699df6a3acf6867538e50931511e9dc403da108a",
+			"revisionTime": "2018-09-27T02:58:44Z"
+		},
+		{
+			"checksumSHA1": "6Lm5Qlu6G3pY/l8aqmgb3Q+HgJ0=",
+			"path": "github.com/mrFranklin/go-log",
+			"revision": "99911ac6cdc3da7535bba520d2380fd9c779d182",
+			"revisionTime": "2019-01-22T08:20:52Z"
+		},
+		{
+			"checksumSHA1": "hev23KrSfQ4KfosxH+gJKziFVtA=",
+			"path": "github.com/rs/cors",
+			"revision": "76f58f330d76a55c5badc74f6212e8a15e742c77",
+			"revisionTime": "2019-01-16T17:59:10Z"
+		}
+	],
+	"rootPath": "github.com/mrFranklin/web3go"
+}
