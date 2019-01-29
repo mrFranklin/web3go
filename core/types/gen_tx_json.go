@@ -25,10 +25,10 @@ func (t txdata) MarshalJSON() ([]byte, error) {
 		V            *hexutil.Big    `json:"v" gencodec:"required"`
 		R            *hexutil.Big    `json:"r" gencodec:"required"`
 		S            *hexutil.Big    `json:"s" gencodec:"required"`
-		Hash         *common.Hash    `json:"hash" rlp:"-"`
-		BlockNumber  *string         `json:"blockNumber,omitempty"`
-		BlockHash    *common.Hash    `json:"blockHash,omitempty"`
-		From         *common.Address `json:"from,omitempty"`
+		Hash         common.Hash     `json:"hash" rlp:"-"  gencodec:"required"`
+		BlockNumber  *hexutil.Big    `json:"blockNumber,omitempty" gencodec:"required"`
+		BlockHash    common.Hash     `json:"blockHash,omitempty" gencodec:"required"`
+		From         common.Address  `json:"from,omitempty" gencodec:"required"`
 	}
 	var enc txdata
 	enc.AccountNonce = hexutil.Uint64(t.AccountNonce)
@@ -41,7 +41,7 @@ func (t txdata) MarshalJSON() ([]byte, error) {
 	enc.R = (*hexutil.Big)(t.R)
 	enc.S = (*hexutil.Big)(t.S)
 	enc.Hash = t.Hash
-	enc.BlockNumber = t.BlockNumber
+	enc.BlockNumber = (*hexutil.Big)(t.BlockNumber)
 	enc.BlockHash = t.BlockHash
 	enc.From = t.From
 	return json.Marshal(&enc)
@@ -59,10 +59,10 @@ func (t *txdata) UnmarshalJSON(input []byte) error {
 		V            *hexutil.Big    `json:"v" gencodec:"required"`
 		R            *hexutil.Big    `json:"r" gencodec:"required"`
 		S            *hexutil.Big    `json:"s" gencodec:"required"`
-		Hash         *common.Hash    `json:"hash" rlp:"-"`
-		BlockNumber  *string         `json:"blockNumber,omitempty"`
-		BlockHash    *common.Hash    `json:"blockHash,omitempty"`
-		From         *common.Address `json:"from,omitempty"`
+		Hash         *common.Hash    `json:"hash" rlp:"-"  gencodec:"required"`
+		BlockNumber  *hexutil.Big    `json:"blockNumber,omitempty" gencodec:"required"`
+		BlockHash    *common.Hash    `json:"blockHash,omitempty" gencodec:"required"`
+		From         *common.Address `json:"from,omitempty" gencodec:"required"`
 	}
 	var dec txdata
 	if err := json.Unmarshal(input, &dec); err != nil {
@@ -103,17 +103,21 @@ func (t *txdata) UnmarshalJSON(input []byte) error {
 		return errors.New("missing required field 's' for txdata")
 	}
 	t.S = (*big.Int)(dec.S)
-	if dec.Hash != nil {
-		t.Hash = dec.Hash
+	if dec.Hash == nil {
+		return errors.New("missing required field 'hash' for txdata")
 	}
-	if dec.BlockNumber != nil {
-		t.BlockNumber = dec.BlockNumber
+	t.Hash = *dec.Hash
+	if dec.BlockNumber == nil {
+		return errors.New("missing required field 'blockNumber' for txdata")
 	}
-	if dec.BlockHash != nil {
-		t.BlockHash = dec.BlockHash
+	t.BlockNumber = (*big.Int)(dec.BlockNumber)
+	if dec.BlockHash == nil {
+		return errors.New("missing required field 'blockHash' for txdata")
 	}
-	if dec.From != nil {
-		t.From = dec.From
+	t.BlockHash = *dec.BlockHash
+	if dec.From == nil {
+		return errors.New("missing required field 'from' for txdata")
 	}
+	t.From = *dec.From
 	return nil
 }

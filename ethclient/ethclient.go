@@ -85,7 +85,7 @@ type rpcBlock struct {
 	Hash         common.Hash         `json:"hash"`
 	Size         hexutil.Uint64      `json:"size"`
 	Td           *hexutil.Big        `json:"totalDifficulty"`
-	Transactions []types.Transaction `json:"transactions"`
+	Transactions []*types.Transaction `json:"transactions"`
 	UncleHashes  []common.Hash       `json:"uncles"`
 }
 
@@ -143,15 +143,7 @@ func (ec *Client) getBlock(ctx context.Context, method string, args ...interface
 			}
 		}
 	}
-	// Fill the sender cache of transactions in the block.
-	txs := make([]*types.Transaction, len(body.Transactions))
-	for i, tx := range body.Transactions {
-		if tx.From() != nil {
-			setSenderFromServer(&tx, *tx.From(), body.Hash)
-		}
-		txs[i] = &tx
-	}
-	block := types.NewBlockWithHeader(head).WithBody(txs, uncles)
+	block := types.NewBlockWithHeader(head).WithBody(body.Transactions, uncles)
 	block.SetHash(body.Hash)
 	block.SetSize(common.StorageSize(body.Size))
 	block.SetTd((*big.Int)(body.Td))
@@ -190,9 +182,6 @@ func (ec *Client) TransactionByHash(ctx context.Context, hash common.Hash) (tx *
 		return nil, false, ethereum.NotFound
 	} else if _, r, _ := json.RawSignatureValues(); r == nil {
 		return nil, false, fmt.Errorf("server returned transaction without signature")
-	}
-	if json.From() != nil && json.BlockHash() != nil {
-		setSenderFromServer(json, *json.From(), *json.BlockHash())
 	}
 	return json, json.BlockNumber == nil, nil
 }
@@ -239,9 +228,6 @@ func (ec *Client) TransactionInBlock(ctx context.Context, blockHash common.Hash,
 		} else if _, r, _ := json.RawSignatureValues(); r == nil {
 			return nil, fmt.Errorf("server returned transaction without signature")
 		}
-	}
-	if json.From != nil && json.BlockHash != nil {
-		setSenderFromServer(json, *json.From(), *json.BlockHash())
 	}
 	return json, err
 }

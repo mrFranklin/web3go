@@ -19,14 +19,13 @@ package types
 import (
 	"container/heap"
 	"errors"
+	"github.com/mrFranklin/web3go/common/hexutil"
+	"github.com/mrFranklin/web3go/rlp"
 	"io"
 	"math/big"
 	"sync/atomic"
 
 	"github.com/mrFranklin/web3go/common"
-	"github.com/mrFranklin/web3go/common/hexutil"
-	"github.com/mrFranklin/web3go/crypto"
-	"github.com/mrFranklin/web3go/rlp"
 )
 
 //go:generate gencodec -type txdata -field-override txdataMarshaling -out gen_tx_json.go
@@ -38,9 +37,9 @@ var (
 type Transaction struct {
 	data txdata
 	// caches
-	hash atomic.Value
+	// hash atomic.Value
 	size atomic.Value
-	from atomic.Value
+	// from atomic.Value
 }
 
 type txdata struct {
@@ -57,11 +56,11 @@ type txdata struct {
 	S *big.Int `json:"s" gencodec:"required"`
 
 	// This is only used when marshaling to JSON.
-	Hash *common.Hash `json:"hash" rlp:"-"`
+	Hash common.Hash `json:"hash" rlp:"-"  gencodec:"required"`
 
-	BlockNumber *string         `json:"blockNumber,omitempty"`
-	BlockHash   *common.Hash    `json:"blockHash,omitempty"`
-	From        *common.Address `json:"from,omitempty"`
+	BlockNumber *big.Int       `json:"blockNumber,omitempty" gencodec:"required"`
+	BlockHash   common.Hash    `json:"blockHash,omitempty" gencodec:"required"`
+	From        common.Address `json:"from,omitempty" gencodec:"required"`
 }
 
 type txdataMarshaling struct {
@@ -73,6 +72,7 @@ type txdataMarshaling struct {
 	V            *hexutil.Big
 	R            *hexutil.Big
 	S            *hexutil.Big
+	BlockNumber  *hexutil.Big
 }
 
 func NewTransaction(nonce uint64, to common.Address, amount *big.Int, gasLimit uint64, gasPrice *big.Int, data []byte) *Transaction {
@@ -145,10 +145,10 @@ func (tx *Transaction) DecodeRLP(s *rlp.Stream) error {
 
 // MarshalJSON encodes the web3 RPC transaction format.
 func (tx *Transaction) MarshalJSON() ([]byte, error) {
-	hash := tx.Hash()
-	data := tx.data
-	data.Hash = &hash
-	return data.MarshalJSON()
+	// hash := tx.Hash()
+	// data := tx.data
+	// data.Hash = &hash
+	return tx.data.MarshalJSON()
 }
 
 // UnmarshalJSON decodes the web3 RPC transaction format.
@@ -158,19 +158,19 @@ func (tx *Transaction) UnmarshalJSON(input []byte) error {
 		return err
 	}
 
-	withSignature := dec.V.Sign() != 0 || dec.R.Sign() != 0 || dec.S.Sign() != 0
-	if withSignature {
-		var V byte
-		if isProtectedV(dec.V) {
-			chainID := deriveChainId(dec.V).Uint64()
-			V = byte(dec.V.Uint64() - 35 - 2*chainID)
-		} else {
-			V = byte(dec.V.Uint64() - 27)
-		}
-		if !crypto.ValidateSignatureValues(V, dec.R, dec.S, false) {
-			return ErrInvalidSig
-		}
-	}
+	// withSignature := dec.V.Sign() != 0 || dec.R.Sign() != 0 || dec.S.Sign() != 0
+	// if withSignature {
+	// 	var V byte
+	// 	if isProtectedV(dec.V) {
+	// 		chainID := deriveChainId(dec.V).Uint64()
+	// 		V = byte(dec.V.Uint64() - 35 - 2*chainID)
+	// 	} else {
+	// 		V = byte(dec.V.Uint64() - 27)
+	// 	}
+	// 	if !crypto.ValidateSignatureValues(V, dec.R, dec.S, false) {
+	// 		return ErrInvalidSig
+	// 	}
+	// }
 
 	*tx = Transaction{data: dec}
 	return nil
@@ -183,9 +183,9 @@ func (tx *Transaction) Value() *big.Int    { return new(big.Int).Set(tx.data.Amo
 func (tx *Transaction) Nonce() uint64      { return tx.data.AccountNonce }
 func (tx *Transaction) CheckNonce() bool   { return true }
 
-func (tx *Transaction) BlockHash() *common.Hash { return tx.data.BlockHash }
-func (tx *Transaction) BlockNumber() *string    { return tx.data.BlockNumber }
-func (tx *Transaction) From() *common.Address   { return tx.data.From }
+func (tx *Transaction) BlockHash() common.Hash { return tx.data.BlockHash }
+func (tx *Transaction) BlockNumber() *big.Int  { return tx.data.BlockNumber }
+func (tx *Transaction) From() common.Address   { return tx.data.From }
 
 // To returns the recipient address of the transaction.
 // It returns nil if the transaction is a contract creation.
@@ -200,12 +200,7 @@ func (tx *Transaction) To() *common.Address {
 // Hash hashes the RLP encoding of tx.
 // It uniquely identifies the transaction.
 func (tx *Transaction) Hash() common.Hash {
-	if hash := tx.hash.Load(); hash != nil {
-		return hash.(common.Hash)
-	}
-	v := rlpHash(tx)
-	tx.hash.Store(v)
-	return v
+	return tx.data.Hash
 }
 
 // Size returns the true RLP encoded storage size of the transaction, either by
@@ -219,6 +214,7 @@ func (tx *Transaction) Size() common.StorageSize {
 	tx.size.Store(common.StorageSize(c))
 	return common.StorageSize(c)
 }
+
 
 // AsMessage returns the transaction as a core.Message.
 //

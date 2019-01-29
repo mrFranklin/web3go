@@ -197,7 +197,7 @@ type DposConfig struct {
 	WitnessCount  uint             `json:"witnessCount"` // Count as block witness
 	Witnesses     []common.Address `json:"witnesses"`    // InContractOwneritial witness nodes
 	ContractOwner common.Address   `json:"owner"`        // Owner of dpos contract
-	BlockReward   *big.Int         `json:blockReward`    // reward for produce a block
+	BlockReward   *big.Int         `json:"blockReward"`  // reward for produce a block
 }
 
 // String implements the stringer interface, returning the consensus engine details.
