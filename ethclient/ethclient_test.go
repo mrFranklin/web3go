@@ -22,7 +22,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ethereum/go-ethereum"
+	"github.com/mrFranklin/web3go"
 	"github.com/mrFranklin/web3go/common"
 )
 

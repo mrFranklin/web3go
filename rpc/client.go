@@ -32,7 +32,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/mrFranklin/go-log"
+	"github.com/mrFranklin/web3go/log"
 )
 
 var (

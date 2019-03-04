@@ -31,7 +31,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mrFranklin/go-log"
+	"github.com/mrFranklin/web3go/log"
 	"github.com/rs/cors"
 )
 

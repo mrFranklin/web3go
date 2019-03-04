@@ -23,7 +23,7 @@ import (
 
 	"github.com/mrFranklin/web3go/common"
 	"github.com/mrFranklin/web3go/crypto"
-	"github.com/mrFranklin/go-log"
+	"github.com/mrFranklin/web3go/log"
 )
 
 var (

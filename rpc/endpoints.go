@@ -19,7 +19,7 @@ package rpc
 import (
 	"net"
 
-	"github.com/mrFranklin/go-log"
+	"github.com/mrFranklin/web3go/log"
 )
 
 // StartHTTPEndpoint starts the HTTP RPC endpoint, configured with cors/vhosts/modules

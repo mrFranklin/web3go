@@ -24,7 +24,7 @@ import (
 
 	"github.com/allegro/bigcache"
 	"github.com/mrFranklin/web3go/common"
-	"github.com/mrFranklin/go-log"
+	"github.com/mrFranklin/web3go/log"
 	"github.com/mrFranklin/web3go/rlp"
 )
 
