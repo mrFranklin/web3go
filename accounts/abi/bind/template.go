@@ -68,7 +68,7 @@ import (
 	"math/big"
 	"strings"
 
-	ethereum "github.com/mrFranklin/web3go"
+	ethereum "github.com/mrFranklin/web3go/ethereum"
 	"github.com/mrFranklin/web3go/accounts/abi"
 	"github.com/mrFranklin/web3go/accounts/abi/bind"
 	"github.com/mrFranklin/web3go/common"

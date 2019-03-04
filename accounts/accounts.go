@@ -20,7 +20,7 @@ package accounts
 import (
 	"math/big"
 
-	ethereum "github.com/mrFranklin/web3go"
+	ethereum "github.com/mrFranklin/web3go/ethereum"
 	"github.com/mrFranklin/web3go/common"
 	"github.com/mrFranklin/web3go/core/types"
 	"github.com/mrFranklin/web3go/event"

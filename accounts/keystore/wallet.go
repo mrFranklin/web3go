@@ -19,7 +19,7 @@ package keystore
 import (
 	"math/big"
 
-	ethereum "github.com/mrFranklin/web3go"
+	ethereum "github.com/mrFranklin/web3go/ethereum"
 	"github.com/mrFranklin/web3go/accounts"
 	"github.com/mrFranklin/web3go/core/types"
 )
