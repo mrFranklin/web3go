@@ -125,6 +125,9 @@ func (h Hash) Generate(rand *rand.Rand, size int) reflect.Value {
 
 // Scan implements Scanner for database/sql.
 func (h *Hash) Scan(src interface{}) error {
+	if src == nil {
+		return nil
+	}
 	srcB, ok := src.([]byte)
 	if !ok {
 		return fmt.Errorf("can't scan %T into Hash", src)
@@ -252,6 +255,9 @@ func (a *Address) UnmarshalJSON(input []byte) error {
 
 // Scan implements Scanner for database/sql.
 func (a *Address) Scan(src interface{}) error {
+	if src == nil {
+		return nil
+	}
 	srcB, ok := src.([]byte)
 	if !ok {
 		return fmt.Errorf("can't scan %T into Address", src)
