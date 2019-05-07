@@ -58,9 +58,9 @@ type txdata struct {
 	// This is only used when marshaling to JSON.
 	Hash common.Hash `json:"hash" rlp:"-"  gencodec:"required"`
 
-	BlockNumber *big.Int       `json:"blockNumber,omitempty" gencodec:"required"`
-	BlockHash   common.Hash    `json:"blockHash,omitempty" gencodec:"required"`
-	From        common.Address `json:"from,omitempty" gencodec:"required"`
+	BlockNumber *big.Int       `json:"blockNumber,omitempty" rlp:"-" gencodec:"required"`
+	BlockHash   common.Hash    `json:"blockHash,omitempty" rlp:"-" gencodec:"required"`
+	From        common.Address `json:"from,omitempty" rlp:"-" gencodec:"required"`
 }
 
 type txdataMarshaling struct {

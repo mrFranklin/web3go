@@ -183,7 +183,7 @@ func (ec *Client) TransactionByHash(ctx context.Context, hash common.Hash) (tx *
 	} else if _, r, _ := json.RawSignatureValues(); r == nil {
 		return nil, false, fmt.Errorf("server returned transaction without signature")
 	}
-	return json, json.BlockNumber == nil, nil
+	return json, json.BlockNumber() == nil, nil
 }
 
 // TransactionSender returns the sender address of the given transaction. The transaction

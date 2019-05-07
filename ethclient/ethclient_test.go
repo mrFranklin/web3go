@@ -22,8 +22,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/mrFranklin/web3go/ethereum"
 	"github.com/mrFranklin/web3go/common"
+	"github.com/mrFranklin/web3go/ethereum"
 )
 
 // Verify that Client implements the ethereum interfaces.
