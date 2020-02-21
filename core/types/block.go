@@ -155,7 +155,7 @@ func (b *Block) DeprecatedTd() *big.Int {
 	return b.td
 }
 
-// Asterera
+// Feature
 func (b *Block) SetTd(td *big.Int) {
 	b.td = td
 }
@@ -328,7 +328,7 @@ func (b *Block) Size() common.StorageSize {
 	return common.StorageSize(c)
 }
 
-// Asterera
+// Feature
 func (b *Block) SetSize(size common.StorageSize) {
 	b.size.Store(size)
 }
@@ -381,7 +381,7 @@ func (b *Block) Hash() common.Hash {
 	return v
 }
 
-// Asterera
+// Feature
 func (b *Block) SetHash(h common.Hash) {
 	b.hash.Store(h)
 }

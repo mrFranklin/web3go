@@ -165,9 +165,8 @@ type ChainConfig struct {
 	Ethash *EthashConfig `json:"ethash,omitempty"`
 	Clique *CliqueConfig `json:"clique,omitempty"`
 
-	// Asterera
-	Dpos     *DposConfig     `json:"dpos,omitempty"`
-	Asterera *AstereraConfig `json:"asterera,omitempty"`
+	// Feature
+	Dpos *DposConfig `json:"dpos,omitempty"`
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.
@@ -189,7 +188,7 @@ func (c *CliqueConfig) String() string {
 	return "clique"
 }
 
-// Asterera
+// Feature
 // DposConfig is the consensus engine configs for delegated-proof-of-stake based sealing
 type DposConfig struct {
 	Period        uint64           `json:"period"`       // Number of seconds between blocks to enforce
@@ -203,15 +202,6 @@ type DposConfig struct {
 // String implements the stringer interface, returning the consensus engine details.
 func (d *DposConfig) String() string {
 	return "dpos"
-}
-
-// Asterera config
-type AstereraConfig struct {
-	TxPermitContractOwner common.Address `json:"txPermitOwner"` // Owner of the tx-permission contract
-}
-
-func (a *AstereraConfig) String() string {
-	return "asterea"
 }
 
 // String implements the fmt.Stringer interface.

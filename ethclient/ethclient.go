@@ -80,7 +80,7 @@ func (ec *Client) BlockByNumber(ctx context.Context, number *big.Int) (*types.Bl
 	return ec.getBlock(ctx, "eth_getBlockByNumber", toBlockNumArg(number), true)
 }
 
-// Asterera
+// Feature
 type rpcBlock struct {
 	Hash         common.Hash         `json:"hash"`
 	Size         hexutil.Uint64      `json:"size"`
@@ -506,7 +506,7 @@ func toCallArg(msg ethereum.CallMsg) interface{} {
 	return arg
 }
 
-// Asterera
+// Feature
 func (ec *Client) GetChainConfig(ctx context.Context) (*params.ChainConfig, error) {
 	var chainConfig *params.ChainConfig
 	err := ec.c.CallContext(ctx, &chainConfig, "eth_getChainConfig")
